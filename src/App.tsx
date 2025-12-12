@@ -1,35 +1,112 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import "./index.css";
 
+type Item = {
+  id: number;
+  description: string;
+  quantity: number;
+  packed: boolean;
+};
+const initialItems = [
+  { id: 1, description: "Passports", quantity: 2, packed: false },
+  { id: 2, description: "Socks", quantity: 12, packed: false },
+];
 function App() {
-  const [count, setCount] = useState(0)
+  const [items, setItems] = useState<Item[]>(initialItems);
+  function handleAddItem(item: Item) {
+    setItems(() => [...items, item]);
+  }
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Logo />
+      <Form onAddItem={handleAddItem} />
+      <PackingList items={items} />
+      <Stats />
     </>
-  )
+  );
 }
 
-export default App
+function Logo() {
+  return (
+    <div>
+      <h1>🌴 Far Away 🚌</h1>
+    </div>
+  );
+}
+
+function Form({ onAddItem }) {
+  const [description, setDescription] = useState("");
+  const [quantity, setQuantity] = useState(0);
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    const newItem = {
+      description,
+      quantity,
+      packed: false,
+      id: Date.now(),
+    };
+    //console.log(newItem);
+    onAddItem(newItem);
+    setDescription("");
+    setQuantity(1);
+  }
+
+  return (
+    <>
+      <form className="add-form" onSubmit={handleSubmit}>
+        <h3> The types of documents</h3>
+        <select
+          value={quantity}
+          onChange={(e) => setQuantity(Number(e.target.value))}
+        >
+          {Array.from({ length: 20 }, (_, i) => i + 1).map((item) => (
+            <option value={item}>{item}</option>
+          ))}
+        </select>
+        <input
+          type="text"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          name=""
+          id=""
+        />
+        <button>Add</button>
+      </form>
+    </>
+  );
+}
+
+function PackingList({ items }) {
+  return (
+    <div className="list">
+      <ul>
+        {items.map((item) => (
+          <Item item={item} />
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function Item({ item }: any) {
+  return (
+    <div>
+      <span>
+        {item.quantity}&nbsp;
+        {item.description}
+      </span>
+    </div>
+  );
+}
+
+function Stats() {
+  return (
+    <div className="stats">
+      <p>There are X things are packed from X amount</p>
+    </div>
+  );
+}
+export default App;
